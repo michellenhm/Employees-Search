@@ -4,10 +4,12 @@ import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Table from "react-bootstrap/Table";
 import Button from "react-bootstrap/Button";
+import { useNavigate } from "react-router-dom";
 
 
 const Dashboard = () => {
     const [employees, setEmployees] = useState([]);
+    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchEmployees = async () => {
@@ -25,6 +27,10 @@ const Dashboard = () => {
         }
         fetchEmployees();
     }, []);
+
+    const handleUpdate = (employeeId) => {
+        navigate(`/employee/${employeeId}`);
+    }
 
     const handleDelete = async (employeeId) => {
         try{
@@ -65,7 +71,7 @@ const Dashboard = () => {
                                         <td>{employee.phone}</td>
                                         <td>{employee.department}</td>
                                         <td>
-                                            <Button variant="outline-secondary">Update</Button>
+                                            <Button onClick={() => handleUpdate(employee.id)} variant="outline-secondary">Update</Button>
                                             <Button onClick={() => handleDelete(employee.id)} variant="outline-danger">Delete</Button>
                                         </td>
                                     </tr>

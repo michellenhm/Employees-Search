@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor // want to inject employee repo
@@ -33,4 +34,19 @@ public class EmployeeService {
         return employeeRepository.findById(id).orElse(null);
     }
 
+    //given id of possibly existingEmployee, set its values to that of employee
+    public Employee updateEmployee(Long id, Employee employee) {
+        Optional<Employee> optionalEmployee = employeeRepository.findById(id);
+        if (optionalEmployee.isPresent()) {
+            Employee existingEmployee = optionalEmployee.get();
+
+            existingEmployee.setName(employee.getName());
+            existingEmployee.setEmail(employee.getEmail());
+            existingEmployee.setPhone(employee.getPhone());
+            existingEmployee.setDepartment(employee.getDepartment());
+
+            return employeeRepository.save(existingEmployee);
+        }
+        return null;
+    }
 }

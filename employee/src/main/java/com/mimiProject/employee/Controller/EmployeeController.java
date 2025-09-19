@@ -37,6 +37,7 @@ public class EmployeeController {
         }
     }
 
+    //fills in the input fields
     @GetMapping("/employee/{id}")
     public ResponseEntity<?> getEmployeeById(@PathVariable Long id){
         Employee employee = employeeService.getEmployeeById(id);
@@ -45,4 +46,16 @@ public class EmployeeController {
         }
         return new ResponseEntity<>(employee, HttpStatus.OK);
     }
+
+    //pathvariable bc id is from route
+    @PatchMapping("/employee/{id}")
+    public ResponseEntity<?> updateEmployee(@PathVariable Long id, @RequestBody Employee employee){
+        Employee updatedEmployee = employeeService.updateEmployee(id, employee);
+
+        if (updatedEmployee == null){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+        return ResponseEntity.ok(updatedEmployee);
+    }
+
 }
