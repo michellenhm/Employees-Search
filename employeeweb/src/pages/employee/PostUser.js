@@ -2,6 +2,7 @@ import "./PostUser.css"
 import React, { useState } from 'react'
 import Form from "react-bootstrap/Form"
 import Button from "react-bootstrap/Button"
+import {useNavigate} from "react-router-dom"
 
 const PostUser = () => {
     const [formData, setFormData] = useState({
@@ -16,7 +17,7 @@ const PostUser = () => {
         const {name,value} = event.target;
         
         //immediate restrictions
-        if (name === "phone" && (!/^\d*$/.test(value)) || (value.length>10) ) {
+        if (name === "phone" && ((!/^\d*$/.test(value)) || (value.length>10)) ) {
             return; 
         }
 
@@ -39,28 +40,44 @@ const PostUser = () => {
         }
     }
 
-    const handleSubmit = (event) => {
-        event.preventDefault();
-        let newErrors = {};
+    const navigate = useNavigate();
 
+    const handleSubmit = async (event) => { // add that info into db
+        event.preventDefault(); // prevent reload page
+        
+        // 1. Perform check before we can submit / add to db
+        let newErrors = {};
         //ensure user fill each field before submit
         Object.keys(formData).forEach((key) => {
             if (!formData[key]) {
                 newErrors[key] = "This field is required";
             }
         });
-
         // validate input, add errors
         if (formData.email && !/\S+@\S+\.\S+/.test(formData.email)) {
             newErrors.email = "Invalid email format";
         }
-
+        //dont work if error
         if (Object.keys(newErrors).length >0) {
             setErrors(newErrors);
             return;
         }
+        //2. Try add to db
+        try {
+            const response = await fetch('http://localhost:8080/api/employee', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(formData),
+            });
+            const data = await response.json();
+            console.log("Employee created: ", data);
 
-        console.log("Form submitted: ", formData);
+            //take user back to dash using navigate
+            navigate("/");
+
+        } catch (e) {
+            console.log("Form NOT submitted: ", e.message);
+        }
     }
 
     return (
@@ -112,9 +129,8 @@ const PostUser = () => {
                 </Form.Group>
 
                 <Button variant="primary" type="submit" className="w-100"> Add Employee </Button>
-
-                
             </Form>
+            {/* add a button here to notify if we added employee */}
         </div>
     )
 }
